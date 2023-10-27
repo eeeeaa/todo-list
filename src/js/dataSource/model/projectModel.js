@@ -8,9 +8,17 @@ export class Project {
      * @param {String} projectName 
      * @param {Array<Todo>} todoList 
      */
-    constructor(projectName, todoList){
+    constructor(projectName, todoList) {
         this.projectName = projectName;
         this.#_todoList = todoList;
+    }
+
+    toString = () => {
+        let str = "";
+        for (let i = 0; i < this.#_todoList.length; i++) {
+            str += `[${this.#_todoList[i].toString()}]`;
+        }
+        return str;
     }
 
     getTodoList = () => {
@@ -19,8 +27,8 @@ export class Project {
 
     setTodoList = (newList) => {
         this.#_todoList = [];
-        for(let i = 0; i < newList.length; i++){
-            if(!(newList[i] instanceof Todo)){
+        for (let i = 0; i < newList.length; i++) {
+            if (!(newList[i] instanceof Todo)) {
                 throw new Error("this is not a Todo list!");
             }
             this.#_todoList.push(newList[i]);
@@ -52,15 +60,16 @@ export class Project {
     }
 
     swapTodo = (firstIndex, secondIndex) => {
-        [this.#_todoList[firstIndex], this.#_todoList[secondIndex]] = 
-        [this.#_todoList[secondIndex], this.#_todoList[firstIndex]];
+        const temp = this.#_todoList[firstIndex];
+        this.#_todoList[firstIndex] = this.#_todoList[secondIndex];
+        this.#_todoList[secondIndex] = temp;
     }
 
     sortTodoByPriority = () => {
-        this.#_todoList.sort( (a,b) => {
-            if(a.priority > b.priority){
+        this.#_todoList.sort((a, b) => {
+            if (a.priority > b.priority) {
                 return -1;
-            } else if (a.priority < b.priority){
+            } else if (a.priority < b.priority) {
                 return 1;
             } else {
                 return 0;
@@ -73,7 +82,7 @@ export class Project {
         const genDate = () => {
             return `${Math.round((Math.random() + 1) * 6)}/${Math.round((Math.random() + 1) * 12)}/${Math.round((Math.random() + 1) * 1000)}`;
         }
-        for(let i = 0; i < quantity; i++){
+        for (let i = 0; i < quantity; i++) {
             const todo = new Todo(
                 (Math.random() + 1).toString(36).substring(5),
                 (Math.random() + 1).toString(36).substring(5),

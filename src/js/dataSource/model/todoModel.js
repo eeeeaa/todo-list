@@ -20,6 +20,20 @@ export class Todo{
         this.isChecked = isChecked;
     }
 
+    toString = () => {
+        return `
+        
+        ${this.title}, 
+        ${this.description}, 
+        ${this.#_dueDate}, 
+        ${this.#_priority},
+        ${this.memo},
+        ${this.isChecked}
+
+        
+        `
+    }
+
     get dueDate() {
         return this.#_dueDate;
     }
