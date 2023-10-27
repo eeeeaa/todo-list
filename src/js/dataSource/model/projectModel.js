@@ -71,7 +71,7 @@ export class Project {
     generateRandomNotes = (quantity) => {
         this.#_todoList = [];
         const genDate = () => {
-            return `${Math.round((Math.random() + 1) * 6)}/${Math.round((Math.random() + 1) * 12)}/${Math.round((Math.random() + 1) * 1000)};`;
+            return `${Math.round((Math.random() + 1) * 6)}/${Math.round((Math.random() + 1) * 12)}/${Math.round((Math.random() + 1) * 1000)}`;
         }
         for(let i = 0; i < quantity; i++){
             const todo = new Todo(
