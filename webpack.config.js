@@ -2,7 +2,7 @@ const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
-  entry: './src/js/todo.js',
+  entry: './src/js/index.js',
   mode: 'production',
   devtool: 'source-map',
   output: {
