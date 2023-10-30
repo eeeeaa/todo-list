@@ -91,6 +91,5 @@ export {
     getProjectAt,
     getFirstProject,
     getLastProject,
-    getProjects,
-    fetchProjectsFromDataSource
+    getProjects
 }

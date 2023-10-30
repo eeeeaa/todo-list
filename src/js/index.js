@@ -1,6 +1,6 @@
 import '../css/style.css';
 import { Project } from './dataSource/model/projectModel';
-import { pushProject, getProjects, fetchProjectsFromDataSource } from './repository/repository';
+import { pushProject, getProjects } from './repository/repository';
 
 const project = new Project("dummy1", []);
 const project2 = new Project("dummy2", []);
