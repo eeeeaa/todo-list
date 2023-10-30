@@ -1,14 +1,23 @@
-import { setStorage, getStorage } from "../dataSource/localDataSource";
+import { setStorage, getStorage,clearStorage } from "../dataSource/localDataSource";
 import { Project } from "../dataSource/model/projectModel";
 
 const PROJECT_KEY = "projects";
+let projectList = [];
+
+function fetchProjectsFromDataSource(){
+    const localProjects = getStorage()[PROJECT_KEY];
+    if(localProjects != undefined){
+        projectList = JSON.parse(localProjects);
+    }
+}
 
 function getProjects() {
-    const projects = getStorage()[PROJECT_KEY];
-    if(projects == undefined){
-        setStorage(PROJECT_KEY, []);
-    }
-    return getStorage()[PROJECT_KEY];
+    return projectList;
+}
+
+function setProjects(projects){
+    projectList = projects;
+    setStorage(PROJECT_KEY, JSON.stringify(projectList));
 }
 
 /**
@@ -18,13 +27,13 @@ function getProjects() {
 function pushProject(project) {
     const projects = getProjects();
     projects.push(project);
-    setStorage(PROJECT_KEY, projects);
+    setProjects(projects);
 }
 
 function popProject() {
     const projects = getProjects();
     let removed = projects.pop();
-    setStorage(PROJECT_KEY, projects);
+    setProjects(projects);
     return removed;
 }
 
@@ -36,7 +45,7 @@ function popProject() {
 function removeProjectAt(index) {
     const projects = getProjects();
     let removed = projects.splice(index, 1);
-    setStorage(PROJECT_KEY, projects);
+    setProjects(projects);
     return removed;
 }
 
@@ -48,7 +57,7 @@ function removeProjectAt(index) {
 function replaceProject(index, project) {
     const projects = getProjects();
     projects[index] = project;
-    setStorage(PROJECT_KEY, projects);
+    setProjects(projects);
 }
 
 
@@ -82,5 +91,6 @@ export {
     getProjectAt,
     getFirstProject,
     getLastProject,
-    getProjects
+    getProjects,
+    fetchProjectsFromDataSource
 }

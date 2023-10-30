@@ -1,6 +1,6 @@
 import '../css/style.css';
 import { Project } from './dataSource/model/projectModel';
-import { pushProject, getProjects, popProject } from './repository/repository';
+import { pushProject, getProjects, fetchProjectsFromDataSource } from './repository/repository';
 
 const project = new Project("dummy1", []);
 const project2 = new Project("dummy2", []);
@@ -14,6 +14,4 @@ pushProject(project);
 pushProject(project2);
 pushProject(project3);
 
-console.log(project.getTodoList());
-console.log(project2.getTodoList());
-console.log(project3.getTodoList());
+console.log(getProjects()[0].getTodoList());
