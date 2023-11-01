@@ -1,38 +1,27 @@
-import { setStorage, getStorage,clearStorage } from "../dataSource/localDataSource";
 import { Project } from "../dataSource/model/projectModel";
 
-const PROJECT_KEY = "projects";
-const CURRENT_PROJECT_KEY = "currentProjectIndex";
+
 let projectList = [];
-let currentProjectIndex = 0;
+let currentProjectIndex = -1;
 
 function setCurrentProjectIndex(index) {
     currentProjectIndex = index;
+    //console.log(`current index: ${currentProjectIndex}`);
 }
 
 function getCurrentProjectIndex() {
+    //console.log(`current index: ${currentProjectIndex}`);
     return currentProjectIndex;
 }
 
-function fetchProjectsFromDataSource(){
-    const localProjects = getStorage()[PROJECT_KEY];
-    const localIndex = getStorage()[CURRENT_PROJECT_KEY];
-    if(localProjects != undefined){
-        projectList = JSON.parse(localProjects);
-    }
-    if(localIndex != undefined){
-        setCurrentProjectIndex(Number(localIndex));
-    }
-}
-
 function getProjects() {
+    //TODO fetch data from storage
     return projectList;
 }
 
 function setProjects(projects){
     projectList = projects;
-    setStorage(PROJECT_KEY, JSON.stringify(projectList));
-    setStorage(CURRENT_PROJECT_KEY, JSON.stringify(getCurrentProjectIndex()));
+    //TODO: store data to storage
 }
 
 /**

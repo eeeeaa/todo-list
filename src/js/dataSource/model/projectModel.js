@@ -39,6 +39,10 @@ export class Project {
         this.#_todoList = [];
     }
 
+    replaceTodo = (index, todo) => {
+        this.#_todoList[index] = todo;
+    }
+
     /**
      * 
      * @param {Todo} todo 
@@ -57,6 +61,10 @@ export class Project {
 
     removeTodoFromTop = () => {
         return this.#_todoList.shift();
+    }
+
+    removeTodoAt = (index) => {
+        return this.#_todoList.splice(index, 1);
     }
 
     swapTodo = (firstIndex, secondIndex) => {
