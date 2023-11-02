@@ -39,10 +39,10 @@ function handleCurrentIndexShiftOnRemove(index, arrayLength) {
     const currentIndex = getCurrentProjectIndex();
     if (arrayLength > 0 && getCurrentProjectIndex() === index) {
         setCurrentProjectIndex(0);
-    } else if(getProjects().length <= 0) {
+    } else if (getProjects().length <= 0) {
         setCurrentProjectIndex(-1);
         clearTodoContainer();
-    } else if(currentIndex > index){
+    } else if (currentIndex > index) {
         setCurrentProjectIndex(currentIndex - 1);
     }
 }
@@ -55,7 +55,7 @@ export function projectListNameToElementMapper(projectList) {
     //console.log(`project count: ${projectList.length}`);
     clearProjectContainer();
 
-    if(projectList.length <= 0){
+    if (projectList.length <= 0) {
         return;
     }
 
@@ -106,7 +106,7 @@ function todoListToElementMapper(project) {
     const todoList = project.getTodoList();
     clearTodoContainer();
 
-    if(todoList.length <= 0){
+    if (todoList.length <= 0) {
         return;
     }
 
@@ -123,7 +123,7 @@ function todoListToElementMapper(project) {
 
             if (isAvailable) {
                 currentProject.removeTodoAt(i);
-                
+
                 replaceProject(getCurrentProjectIndex(), currentProject);
                 projectListNameToElementMapper(getProjects());
             }
@@ -140,9 +140,17 @@ function todoListToElementMapper(project) {
         todoCheckbox.setAttribute("id", "checkbox");
         todoCheckbox.checked = todoList[i].isChecked;
         todoCheckbox.addEventListener("change", (e) => {
-            const temp = Object.assign({}, todoList[i]);
-            temp.isChecked = e.target.checked;
-            project.replaceTodo(i, temp);
+            const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+            const isAvailable = getCurrentProjectIndex() > -1;
+
+            if (isAvailable) {
+                const tempTodo = currentProject.getTodoList().slice()[i];
+                tempTodo.isChecked = e.target.checked;
+                currentProject.replaceTodo(i, tempTodo);
+
+                replaceProject(getCurrentProjectIndex(), currentProject);
+                projectListNameToElementMapper(getProjects());
+            }
         });
 
         todoItem.appendChild(todoDeleteIcon);

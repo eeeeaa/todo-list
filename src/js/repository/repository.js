@@ -1,27 +1,34 @@
 import { Project } from "../dataSource/model/projectModel";
-
+import { storeProjectListInLocalStorage, getProjectListFromLocalStorage, storeCurrentProjectIndexInLocalStorage, getCurrentProjectIndexInLocalStorage } from "../datamapper/datamapper";
 
 let projectList = [];
 let currentProjectIndex = -1;
 
 function setCurrentProjectIndex(index) {
     currentProjectIndex = index;
-    //console.log(`current index: ${currentProjectIndex}`);
+
+    storeCurrentProjectIndexInLocalStorage(currentProjectIndex);
 }
 
 function getCurrentProjectIndex() {
-    //console.log(`current index: ${currentProjectIndex}`);
+
+    currentProjectIndex = getCurrentProjectIndexInLocalStorage();
+    
     return currentProjectIndex;
 }
 
 function getProjects() {
-    //TODO fetch data from storage
+    //fetch data from storage
+    projectList = getProjectListFromLocalStorage();
+
     return projectList;
 }
 
 function setProjects(projects){
     projectList = projects;
-    //TODO: store data to storage
+
+    //store data to storage
+    storeProjectListInLocalStorage(projectList);
 }
 
 /**
