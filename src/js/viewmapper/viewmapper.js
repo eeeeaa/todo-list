@@ -8,7 +8,21 @@ const todoContainer = document.querySelector(".todo-container");
 
 export function initializeView() {
     setupGlobalListeners();
+    updateViewState();
+}
+
+function updateViewState() {
+    updateCreateTodoButtonViewState();
     projectListNameToElementMapper(getProjects());
+}
+
+function updateCreateTodoButtonViewState() {
+    const createTodoButton = document.querySelector(".new-todo-button");
+    if(getProjects().length > 0) {
+        createTodoButton.style.display = "flex";
+    } else {
+        createTodoButton.style.display = "none";
+    }
 }
 
 function setupGlobalListeners() {
@@ -19,7 +33,7 @@ function setupGlobalListeners() {
         const newProject = new Project("test");
         newProject.generateRandomNotes(3);
         pushProject(newProject);
-        projectListNameToElementMapper(getProjects());
+        updateViewState();
     })
 
     createTodoButton.addEventListener("click", (e) => {
@@ -30,7 +44,7 @@ function setupGlobalListeners() {
             currentProject.pushTodo(new Todo("Hello", "World", "08/08/1999", 2, "Lol", false));
 
             replaceProject(getCurrentProjectIndex(), currentProject);
-            projectListNameToElementMapper(getProjects());
+            updateViewState();
         }
     });
 }
@@ -73,7 +87,7 @@ export function projectListNameToElementMapper(projectList) {
                 removeProjectAt(i);
 
                 handleCurrentIndexShiftOnRemove(i, getProjects().length);
-                projectListNameToElementMapper(getProjects());
+                updateViewState();
             }
             e.stopPropagation();
         });
@@ -125,7 +139,7 @@ function todoListToElementMapper(project) {
                 currentProject.removeTodoAt(i);
 
                 replaceProject(getCurrentProjectIndex(), currentProject);
-                projectListNameToElementMapper(getProjects());
+                updateViewState();
             }
             e.stopPropagation();
         });
@@ -149,7 +163,7 @@ function todoListToElementMapper(project) {
                 currentProject.replaceTodo(i, tempTodo);
 
                 replaceProject(getCurrentProjectIndex(), currentProject);
-                projectListNameToElementMapper(getProjects());
+                updateViewState();
             }
         });
 
