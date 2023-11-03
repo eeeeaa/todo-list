@@ -1,10 +1,13 @@
 import { Project } from '../dataSource/model/projectModel';
 import { Todo } from '../dataSource/model/todoModel';
+import { createTodoFormDialog } from './dialogcreator';
 import { getCurrentProjectIndex, setCurrentProjectIndex } from '../repository/repository';
 import { pushProject, getProjects, getProjectAt, replaceProject, removeProjectAt } from '../repository/repository';
 
 const projectContainer = document.querySelector(".project-container");
 const todoContainer = document.querySelector(".todo-container");
+
+const mainContent = document.querySelector("#main-content");
 
 export function initializeView() {
     setupGlobalListeners();
@@ -37,7 +40,7 @@ function setupGlobalListeners() {
     })
 
     createTodoButton.addEventListener("click", (e) => {
-        const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+        /* const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
         const isAvailable = getCurrentProjectIndex() > -1;
 
         if (isAvailable) {
@@ -45,7 +48,9 @@ function setupGlobalListeners() {
 
             replaceProject(getCurrentProjectIndex(), currentProject);
             updateViewState();
-        }
+        } */
+
+        mainContent.prepend(createTodoFormDialog());
     });
 }
 
