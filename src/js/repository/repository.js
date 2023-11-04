@@ -94,6 +94,10 @@ function getLastProject() {
     return projects[projects.length - 1];
 }
 
+function getProjectCount() {
+    return getProjects().length;
+}
+
 export {
     pushProject,
     popProject,
@@ -104,5 +108,6 @@ export {
     getLastProject,
     getProjects,
     setCurrentProjectIndex,
-    getCurrentProjectIndex
+    getCurrentProjectIndex,
+    getProjectCount
 }

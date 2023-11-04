@@ -1,5 +1,5 @@
 import '../css/style.css';
-import { initializeView } from './viewmapper/viewmapper';
+import { initializeView } from './view/viewmapper';
 
 initializeView();
 

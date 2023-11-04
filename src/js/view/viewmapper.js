@@ -1,27 +1,48 @@
 import { Project } from '../dataSource/model/projectModel';
 import { Todo } from '../dataSource/model/todoModel';
-import { createTodoFormDialog } from './dialogcreator';
+import { createTodoFormDialog, createProjectFormDialog } from './dialogHandler';
 import { getCurrentProjectIndex, setCurrentProjectIndex } from '../repository/repository';
-import { pushProject, getProjects, getProjectAt, replaceProject, removeProjectAt } from '../repository/repository';
+import { makeToast } from './toastHandler';
+import { pushProject, getProjects, getProjectAt, replaceProject, removeProjectAt, getProjectCount } from '../repository/repository';
+
+/**
+ * view mapping of data
+ */
 
 const projectContainer = document.querySelector(".project-container");
 const todoContainer = document.querySelector(".todo-container");
 
 const mainContent = document.querySelector("#main-content");
 
+const maxProjectCount = 6;
+const maxTodoCount = 6;
+
 export function initializeView() {
     setupGlobalListeners();
     updateViewState();
 }
 
-function updateViewState() {
+export function updateViewState() {
     updateCreateTodoButtonViewState();
+    updateHeaderTitle();
     projectListNameToElementMapper(getProjects());
+}
+
+function updateHeaderTitle() {
+    const currentProject = getProjectAt(getCurrentProjectIndex());
+    const headerTitle = document.querySelector(".header-title");
+
+    if(currentProject == undefined || getCurrentProjectIndex() <= -1){
+        headerTitle.textContent = "No project selected";
+        return;
+    }
+
+    headerTitle.textContent = currentProject.projectName;
 }
 
 function updateCreateTodoButtonViewState() {
     const createTodoButton = document.querySelector(".new-todo-button");
-    if(getProjects().length > 0) {
+    if (getProjects().length > 0) {
         createTodoButton.style.display = "flex";
     } else {
         createTodoButton.style.display = "none";
@@ -33,24 +54,21 @@ function setupGlobalListeners() {
     const createTodoButton = document.querySelector(".new-todo-button");
 
     createProjectButton.addEventListener("click", (e) => {
-        const newProject = new Project("test");
-        newProject.generateRandomNotes(3);
-        pushProject(newProject);
-        updateViewState();
+        if(getProjectCount() < maxProjectCount){
+           mainContent.prepend(createProjectFormDialog()); 
+        } else {
+            makeToast("project limit reached");
+        }
     })
 
     createTodoButton.addEventListener("click", (e) => {
-        /* const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
-        const isAvailable = getCurrentProjectIndex() > -1;
-
-        if (isAvailable) {
-            currentProject.pushTodo(new Todo("Hello", "World", "08/08/1999", 2, "Lol", false));
-
-            replaceProject(getCurrentProjectIndex(), currentProject);
-            updateViewState();
-        } */
-
-        mainContent.prepend(createTodoFormDialog());
+        const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+        const isAvailable = getCurrentProjectIndex() > -1 && currentProject.getTodoListCount() < maxTodoCount;
+        if(isAvailable){
+           mainContent.prepend(createTodoFormDialog()); 
+        } else {
+            makeToast("todo limit reached");
+        }
     });
 }
 
@@ -111,6 +129,7 @@ export function projectListNameToElementMapper(projectList) {
         projectItem.addEventListener("click", (e) => {
             todoListToElementMapper(projectList[i]);
             setCurrentProjectIndex(i);
+            updateViewState();
         });
 
         projectContainer.appendChild(projectItem);
@@ -133,6 +152,21 @@ function todoListToElementMapper(project) {
         const todoItem = document.createElement("div");
         todoItem.classList.add("todo-item");
         todoItem.setAttribute("data-index", i);
+
+        switch(todoList[i].priority){
+            case 1: {
+                todoItem.style.backgroundColor = "#365314";
+                break;
+            }
+            case 2: {
+                todoItem.style.backgroundColor = "#713f12";
+                break;
+            }
+            case 3: {
+                todoItem.style.backgroundColor = "#7f1d1d";
+                break;
+            }
+        }
 
         const todoDeleteIcon = document.createElement("div");
         todoDeleteIcon.classList.add("todo-delete-icon");

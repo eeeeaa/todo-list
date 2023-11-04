@@ -1,9 +1,53 @@
+import { getCurrentProjectIndex, setCurrentProjectIndex } from '../repository/repository';
+import { pushProject, getProjects, getProjectAt, replaceProject, removeProjectAt } from '../repository/repository';
+import { Project } from '../dataSource/model/projectModel';
+import { Todo } from '../dataSource/model/todoModel';
+import { updateViewState } from './viewmapper';
+
+/*
+ * Handle dialog creation
+ * 
+*/
+
+function createBackdrop() {
+    const body = document.querySelector("body");
+    const backdrop = document.createElement("div");
+    backdrop.classList.add("dialog-background");
+
+    body.prepend(backdrop);
+}
+
+function removeBackdrop() {
+    const backdrop = document.querySelector(".dialog-background");
+    backdrop.remove();
+}
+
+function onDialogOpen(dialog) {
+    dialog.classList.add("fade-in");
+    createBackdrop();
+}
+
+function onDialogClose(dialog) {
+    dialog.classList.remove("fade-in");
+    dialog.style.animation = 'none';
+    dialog.offsetHeight;
+    dialog.classList.add("fade-out");
+    setTimeout(() => {
+        dialog.close();
+        dialog.remove();
+        removeBackdrop();
+    }, 100);
+}
+
+
+//-----------Create todo form dialogs---------------
 export function createTodoFormDialog() {
     const formDialog = document.createElement("dialog");
     formDialog.classList.add("form-dialog");
     formDialog.open = true;
 
     formDialog.appendChild(createTodoForm());
+    onDialogOpen(formDialog);
 
     return formDialog;
 }
@@ -65,7 +109,7 @@ function createMainInfoFieldSet() {
     desTextArea.required = true;
     desTextArea.textContent = "Enter your description here...";
 
-    content.append(todoTitleLabel,todoTitleInput,desLabel,desTextArea);
+    content.append(todoTitleLabel, todoTitleInput, desLabel, desTextArea);
 
     fieldset.append(legend, content);
 
@@ -105,9 +149,9 @@ function createAdditionalInfoFieldSet() {
 
     const radioButtons = createTodoRadioButtons();
 
-    content.append(memoLabel,memoTextArea,dateLabel,dueDateInput,radioButtons);
+    content.append(memoLabel, memoTextArea, dateLabel, dueDateInput, radioButtons);
 
-    fieldset.append(legend,content);
+    fieldset.append(legend, content);
 
     return fieldset;
 
@@ -130,11 +174,11 @@ function createTodoRadioButtons() {
     priorityLowInput.setAttribute("value", "1");
     priorityLowInput.checked = true;
     priorityLowInput.required = true;
-    
+
     const priorityMedLabel = document.createElement("label");
     priorityMedLabel.setAttribute("for", "todo-priority-medium");
     priorityMedLabel.innerHTML = "<div>Medium</div>";
-    
+
     const priorityMedInput = document.createElement("input");
     priorityMedInput.setAttribute("type", "radio");
     priorityMedInput.setAttribute("name", "todo-priority");
@@ -165,11 +209,27 @@ function createTodoFormButtons() {
     submitButton.textContent = "Create/Edit Todo";
     submitButton.addEventListener("click", (e) => {
         const form = document.querySelector(".todo-form");
-        if(!form.checkValidity()){
+        const dialog = document.querySelector(".form-dialog");
+        if (!form.checkValidity()) {
             form.reportValidity();
-        }else{
+        } else {
             e.preventDefault();
-            //TODO
+            const title = form["todo-title"].value;
+            const description = form["todo-description"].value;
+            const dueDate = form["todo-due-date"].value;
+            const priority = Number(form["todo-priority"].value);
+            const memo = form["todo-memo"].value;
+
+            dialogCreateNewTodo(new Todo(
+                title,
+                description,
+                dueDate,
+                priority,
+                memo,
+                false
+            ));
+
+            onDialogClose(dialog);
         }
     });
 
@@ -179,8 +239,7 @@ function createTodoFormButtons() {
     closeButton.textContent = "Close";
     closeButton.addEventListener("click", (e) => {
         const dialog = document.querySelector(".form-dialog");
-        dialog.close();
-        dialog.remove();
+        onDialogClose(dialog);
     });
 
     container.append(submitButton, closeButton);
@@ -188,10 +247,120 @@ function createTodoFormButtons() {
     return container;
 }
 
+
+//-----------view Todo dialogs---------------
 export function createTodoViewDialog() {
     //TODO
 }
 
+
+//-----------Create project dialogs---------------
 export function createProjectFormDialog() {
-    //TODO
+    const formDialog = document.createElement("dialog");
+    formDialog.classList.add("form-dialog");
+    formDialog.open = true;
+
+    formDialog.appendChild(createProjectForm());
+    formDialog.classList.add("slide-in");
+    onDialogOpen(formDialog);
+
+    return formDialog;
+}
+
+function createProjectForm() {
+    const form = document.createElement("form");
+    form.setAttribute("action", "");
+    form.setAttribute("form", "post");
+    form.classList.add("project-form");
+
+    const content = createProjectFormContent();
+    const buttons = createProjectFormButtons();
+
+    form.append(content, buttons);
+
+    return form;
+}
+
+function createProjectFormContent() {
+    const fieldset = document.createElement("fieldset");
+    fieldset.classList.add("project-form-content");
+
+    const legend = document.createElement("legend");
+    legend.textContent = "Project information";
+
+    const projectNameLabel = document.createElement("label");
+    projectNameLabel.setAttribute("for", "project-name");
+    projectNameLabel.innerHTML = "<div>Project name</div>";
+
+    const projectNameInput = document.createElement("input");
+    projectNameInput.setAttribute("type", "text");
+    projectNameInput.setAttribute("name", "project-name");
+    projectNameInput.setAttribute("id", "project-name");
+    projectNameInput.setAttribute("placeholder", "project Name...");
+    projectNameInput.required = true;
+
+    fieldset.append(legend, projectNameLabel, projectNameInput);
+
+    return fieldset;
+
+}
+
+function createProjectFormButtons() {
+    const container = document.createElement("div");
+    container.classList.add("form-buttons");
+
+    const submitButton = document.createElement("button");
+    submitButton.classList.add("primary-button");
+    submitButton.textContent = "Create/Edit Project";
+    submitButton.addEventListener("click", (e) => {
+        const form = document.querySelector(".project-form");
+        const dialog = document.querySelector(".form-dialog");
+        if (!form.checkValidity()) {
+            form.reportValidity();
+        } else {
+            e.preventDefault();
+            dialogCreateNewProject(form["project-name"].value);
+            onDialogClose(dialog);
+        }
+    });
+
+    const closeButton = document.createElement("button");
+    closeButton.setAttribute("type", "button");
+    closeButton.classList.add("secondary-button");
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", (e) => {
+        const dialog = document.querySelector(".form-dialog");
+        onDialogClose(dialog);
+    });
+
+    container.append(submitButton, closeButton);
+
+    return container;
+}
+
+
+
+//-----------database Logics---------------
+
+function dialogCreateNewProject(projectName) {
+    console.log(projectName);
+    const newProject = new Project(projectName, []);
+    pushProject(newProject);
+    updateViewState();
+}
+
+/**
+ * 
+ * @param {Todo} todo 
+ */
+function dialogCreateNewTodo(todo) {
+    console.log(todo);
+    const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+    const isAvailable = getCurrentProjectIndex() > -1;
+
+    if (isAvailable) {
+        currentProject.pushTodo(todo);
+        replaceProject(getCurrentProjectIndex(), currentProject);
+        updateViewState();
+    }
 }

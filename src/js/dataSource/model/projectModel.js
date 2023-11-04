@@ -21,6 +21,10 @@ export class Project {
         return str;
     }
 
+    getTodoListCount = () => {
+        return this.#_todoList.length;
+    }
+
     getTodoList = () => {
         return this.#_todoList;
     }

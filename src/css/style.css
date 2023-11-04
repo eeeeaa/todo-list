@@ -5,6 +5,28 @@
     color: white;
 }
 
+/*Animations*/
+@keyframes fadeIn {
+    0% {
+        opacity: 0;
+    }
+
+    100% {
+        opacity: 1;
+    }
+}
+
+.fade-in {
+    animation: fadeIn 0.1s forwards ease-in-out;
+}
+
+.fade-out {
+    opacity: 0;
+    transition: all 0.1s ease;
+}
+
+/*main style*/
+
 html,
 body {
     display: border-box;
@@ -38,12 +60,13 @@ body {
 
     display: flex;
     justify-content: flex-start;
+    gap: 1em;
     align-items: center;
 
     .header-title {
         font-weight: 700;
-        font-size: xx-large;
-        margin-left: 0.5em;
+        font-size: large;
+        margin-left: 2em;
     }
 }
 
@@ -138,6 +161,51 @@ body {
     background-color: #1e3a8a;
 }
 
+.toast-dialog {
+    border-radius: 1em;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    padding: 1em;
+    transform: translateY(10%);
+    border-color: transparent;
+    border-radius: 2em;
+    background-color: #991b1b;
+}
+
+.dialog-background {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: 9;
+    background-color: black;
+    opacity: 0.2;
+}
+
+.project-form {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 1em;
+    align-items: center;
+
+    .project-form-content {
+        display: grid;
+        grid-template: auto/1fr 1fr;
+        column-gap: 1em;
+        justify-items: center;
+        align-items: center;
+        padding: 1em;
+    }
+
+    .form-buttons {
+        display: grid;
+        grid-template: auto/1fr 1fr;
+        column-gap: 1em;
+    }
+}
+
 .todo-form {
     display: flex;
     flex-direction: column;
@@ -159,6 +227,7 @@ body {
             gap: 1em;
         }
     }
+
     .form-buttons {
         display: grid;
         grid-template: auto/1fr 1fr;
@@ -166,12 +235,47 @@ body {
     }
 }
 
+.primary-button,
+.secondary-button {
+    padding: 0.5em 1em;
+    border-color: transparent;
+    border-radius: 1em;
+}
+
+.new-project-button,
+.new-todo-button {
+    padding: 0.5em 1em;
+    border-color: transparent;
+    border-radius: 1em;
+    background-color: #083344;
+}
+
+.primary-button:hover,
+.secondary-button:hover,
+.new-project-button:hover,
+.new-todo-button:hover {
+    transition: all 0.2s ease;
+}
+
+.new-project-button:hover,
+.new-todo-button:hover {
+    background-color: #164e63;
+}
+
 .primary-button {
-    /*TODO*/
+    background-color: #15803d;
+}
+
+.primary-button:hover {
+    background-color: #16a34a;
 }
 
 .secondary-button {
-     /*TODO*/
+    background-color: #b91c1c;
+}
+
+.secondary-button:hover {
+    background-color: #dc2626;
 }
 
 textarea,
