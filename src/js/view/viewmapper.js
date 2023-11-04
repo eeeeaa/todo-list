@@ -23,7 +23,7 @@ export function initializeView() {
 }
 
 export function updateViewState() {
-    updateCreateTodoButtonViewState();
+    updateButtonViewState();
     updateHeaderTitle();
     projectListNameToElementMapper(getProjects());
 }
@@ -40,18 +40,33 @@ function updateHeaderTitle() {
     headerTitle.textContent = currentProject.projectName;
 }
 
-function updateCreateTodoButtonViewState() {
+function updateButtonViewState() {
     const createTodoButton = document.querySelector(".new-todo-button");
-    if (getProjects().length > 0) {
+    const sortPriorityButton = document.querySelector(".sort-priority-button");
+    if (getProjects().length > 0 && getCurrentProjectIndex() > -1) {
         createTodoButton.style.display = "flex";
+        sortPriorityButton.style.display = "flex";
     } else {
         createTodoButton.style.display = "none";
+        sortPriorityButton.style.display = "none";
     }
 }
 
 function setupGlobalListeners() {
     const createProjectButton = document.querySelector(".new-project-button");
     const createTodoButton = document.querySelector(".new-todo-button");
+    const sortPriorityButton = document.querySelector(".sort-priority-button");
+
+    sortPriorityButton.addEventListener("click", (e) => {
+        const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+        const isAvailable = getCurrentProjectIndex() > -1;
+
+        if(isAvailable) {
+            currentProject.sortTodoByPriority();
+            replaceProject(getCurrentProjectIndex(), currentProject);
+            updateViewState();
+        }
+    });
 
     createProjectButton.addEventListener("click", (e) => {
         if(getProjectCount() < maxProjectCount){
