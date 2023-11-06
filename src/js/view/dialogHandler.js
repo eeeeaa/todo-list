@@ -41,43 +41,67 @@ function onDialogClose(dialog) {
 
 
 //-----------Create todo form dialogs---------------
-export function createTodoFormDialog() {
+/**
+ * 
+ * @param {Todo} oldTodo 
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+export function createTodoFormDialog(oldTodo = null, todoIndex = null) {
     const formDialog = document.createElement("dialog");
     formDialog.classList.add("form-dialog");
     formDialog.open = true;
 
-    formDialog.appendChild(createTodoForm());
+    formDialog.appendChild(createTodoForm(oldTodo, todoIndex));
     onDialogOpen(formDialog);
 
     return formDialog;
 }
 
-function createTodoForm() {
+/**
+ * 
+ * @param {Todo} oldTodo 
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+function createTodoForm(oldTodo, todoIndex) {
     const form = document.createElement("form");
     form.setAttribute("action", "");
     form.setAttribute("form", "post");
     form.classList.add("todo-form");
 
-    const content = createTodoFormContent();
-    const buttons = createTodoFormButtons();
+    const content = createTodoFormContent(oldTodo, todoIndex);
+    const buttons = createTodoFormButtons(oldTodo, todoIndex);
 
     form.append(content, buttons);
 
     return form;
 }
 
-function createTodoFormContent() {
+/**
+ * 
+ * @param {Todo} oldTodo 
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+function createTodoFormContent(oldTodo, todoIndex) {
     const container = document.createElement("div");
     container.classList.add("todo-dialog-content");
 
-    const mainInfo = createMainInfoFieldSet();
-    const additionalInfo = createAdditionalInfoFieldSet();
+    const mainInfo = createMainInfoFieldSet(oldTodo, todoIndex);
+    const additionalInfo = createAdditionalInfoFieldSet(oldTodo, todoIndex);
     container.append(mainInfo, additionalInfo);
 
     return container;
 }
 
-function createMainInfoFieldSet() {
+/**
+ * 
+ * @param {Todo} oldTodo
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+function createMainInfoFieldSet(oldTodo, todoIndex) {
     const fieldset = document.createElement("fieldset");
 
     const legend = document.createElement("legend");
@@ -109,6 +133,11 @@ function createMainInfoFieldSet() {
     desTextArea.required = true;
     desTextArea.textContent = "Enter your description here...";
 
+    if (oldTodo != null && todoIndex != null) {
+        todoTitleInput.value = oldTodo.title;
+        desTextArea.textContent = oldTodo.description;
+    }
+
     content.append(todoTitleLabel, todoTitleInput, desLabel, desTextArea);
 
     fieldset.append(legend, content);
@@ -116,7 +145,13 @@ function createMainInfoFieldSet() {
     return fieldset;
 }
 
-function createAdditionalInfoFieldSet() {
+/**
+ * 
+ * @param {Todo} oldTodo 
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+function createAdditionalInfoFieldSet(oldTodo, todoIndex) {
     const fieldset = document.createElement("fieldset");
 
     const legend = document.createElement("legend");
@@ -147,7 +182,12 @@ function createAdditionalInfoFieldSet() {
     dueDateInput.setAttribute("id", "todo-due-date");
     dueDateInput.required = true;
 
-    const radioButtons = createTodoRadioButtons();
+    const radioButtons = createTodoRadioButtons(oldTodo, todoIndex);
+
+    if (oldTodo != null && todoIndex != null) {
+        memoTextArea.textContent = oldTodo.memo;
+        dueDateInput.value = oldTodo.dueDate;
+    }
 
     content.append(memoLabel, memoTextArea, dateLabel, dueDateInput, radioButtons);
 
@@ -157,7 +197,13 @@ function createAdditionalInfoFieldSet() {
 
 }
 
-function createTodoRadioButtons() {
+/**
+ * 
+ * @param {Todo} oldTodo 
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+function createTodoRadioButtons(oldTodo, todoIndex) {
     const fieldset = document.createElement("fieldset");
 
     const legend = document.createElement("legend");
@@ -172,7 +218,6 @@ function createTodoRadioButtons() {
     priorityLowInput.setAttribute("name", "todo-priority");
     priorityLowInput.setAttribute("id", "todo-priority-low");
     priorityLowInput.setAttribute("value", "1");
-    priorityLowInput.checked = true;
     priorityLowInput.required = true;
 
     const priorityMedLabel = document.createElement("label");
@@ -195,12 +240,37 @@ function createTodoRadioButtons() {
     priorityHighInput.setAttribute("id", "todo-priority-high");
     priorityHighInput.setAttribute("value", "3");
 
+    if (oldTodo != null && todoIndex != null) {
+        switch (oldTodo.priority) {
+            case 1: {
+                priorityLowInput.checked = true;
+                break;
+            }
+            case 2: {
+                priorityMedInput.checked = true;
+                break;
+            }
+            case 3: {
+                priorityHighInput.checked = true;
+                break;
+            }
+        }
+    } else {
+        priorityLowInput.checked = true;
+    }
+
     fieldset.append(legend, priorityLowLabel, priorityLowInput, priorityMedLabel, priorityMedInput, priorityHighLabel, priorityHighInput);
 
     return fieldset;
 }
 
-function createTodoFormButtons() {
+/**
+ * 
+ * @param {Todo} oldTodo 
+ * @param {Number} todoIndex 
+ * @returns 
+ */
+function createTodoFormButtons(oldTodo, todoIndex) {
     const container = document.createElement("div");
     container.classList.add("form-buttons");
 
@@ -220,15 +290,28 @@ function createTodoFormButtons() {
             const priority = Number(form["todo-priority"].value);
             const memo = form["todo-memo"].value;
 
-            dialogCreateNewTodo(new Todo(
-                title,
-                description,
-                dueDate,
-                priority,
-                memo,
-                false
-            ));
-
+            if (oldTodo != null && todoIndex != null) {
+                dialogEditTodo(
+                    new Todo(
+                        title,
+                        description,
+                        dueDate,
+                        priority,
+                        memo,
+                        oldTodo.isChecked
+                    ),
+                    todoIndex
+                )
+            } else {
+                dialogCreateNewTodo(new Todo(
+                    title,
+                    description,
+                    dueDate,
+                    priority,
+                    memo,
+                    false
+                ));
+            }
             onDialogClose(dialog);
         }
     });
@@ -249,39 +332,177 @@ function createTodoFormButtons() {
 
 
 //-----------view Todo dialogs---------------
-export function createTodoViewDialog() {
-    //TODO
-}
-
-
-//-----------Create project dialogs---------------
-export function createProjectFormDialog() {
+/**
+ * 
+ * @param {Todo} todo 
+ * @returns 
+ */
+export function createTodoViewDialog(todo) {
     const formDialog = document.createElement("dialog");
-    formDialog.classList.add("form-dialog");
+    formDialog.classList.add("form-view-dialog");
     formDialog.open = true;
 
-    formDialog.appendChild(createProjectForm());
-    formDialog.classList.add("slide-in");
+    formDialog.appendChild(createTodoView(todo));
     onDialogOpen(formDialog);
 
     return formDialog;
 }
 
-function createProjectForm() {
+/**
+ * 
+ * @param {Todo} todo 
+ * @returns 
+ */
+function createTodoView(todo) {
+    const container = document.createElement("div");
+    container.classList.add("todo-view-container");
+
+    const closeButton = document.createElement("button");
+    closeButton.setAttribute("type", "button");
+    closeButton.classList.add("secondary-button");
+    closeButton.textContent = "Close";
+    closeButton.addEventListener("click", (e) => {
+        const dialog = document.querySelector(".form-view-dialog");
+        onDialogClose(dialog);
+    });
+
+    container.append(
+        createTodoViewHeader(todo),
+        createTodoViewContent(todo),
+        closeButton
+    )
+
+    return container;
+}
+
+/**
+ * 
+ * @param {Todo} todo 
+ * @returns 
+ */
+function createTodoViewHeader(todo) {
+    const container = document.createElement("div");
+    container.classList.add("todo-view-header");
+
+    const title = document.createElement("div");
+    title.classList.add("todo-header-title");
+    title.textContent = todo.title;
+
+    const date = document.createElement("div");
+    date.classList.add("todo-header-date");
+    date.textContent = todo.dueDate;
+
+    const priority = document.createElement("div");
+    priority.classList.add("todo-header-priority");
+
+    switch (todo.priority) {
+        case 1: {
+            container.style.backgroundColor = "#365314";
+            priority.textContent = "Low priority";
+            break;
+        }
+        case 2: {
+            container.style.backgroundColor = "#713f12";
+            priority.textContent = "Medium priority";
+            break;
+        }
+        case 3: {
+            container.style.backgroundColor = "#7f1d1d";
+            priority.textContent = "High priority";
+            break;
+        }
+    }
+
+    container.append(title, date, priority);
+
+    return container;
+}
+
+/**
+ * 
+ * @param {Todo} todo 
+ * @returns 
+ */
+function createTodoViewContent(todo) {
+    const container = document.createElement("div");
+    container.classList.add("todo-view-content");
+
+    const desTitle = document.createElement("div");
+    desTitle.classList.add("todo-content-title");
+    desTitle.textContent = "Description";
+
+    const desTextArea = document.createElement("textarea");
+    desTextArea.setAttribute("name", "todo-view-description");
+    desTextArea.setAttribute("id", "todo-view-description");
+    desTextArea.setAttribute("cols", "50");
+    desTextArea.setAttribute("rows", "10");
+    desTextArea.readOnly = true;
+    desTextArea.textContent = todo.description;
+
+    const memoTitle = document.createElement("div");
+    memoTitle.classList.add("todo-content-title");
+    memoTitle.textContent = "Memo";
+
+    const memoTextArea = document.createElement("textarea");
+    memoTextArea.setAttribute("name", "todo-view-memo");
+    memoTextArea.setAttribute("id", "todo-view-memo");
+    memoTextArea.setAttribute("cols", "50");
+    memoTextArea.setAttribute("rows", "5");
+    memoTextArea.readOnly = true;
+    memoTextArea.textContent = todo.memo;
+
+    container.append(desTitle, desTextArea, memoTitle, memoTextArea);
+
+    return container;
+}
+
+
+//-----------Create project dialogs---------------
+
+/**
+ * 
+ * @param {Project} oldProject 
+ * @param {Number} projectIndex 
+ * @returns 
+ */
+export function createProjectFormDialog(oldProject = null, projectIndex = null) {
+    const formDialog = document.createElement("dialog");
+    formDialog.classList.add("form-dialog");
+    formDialog.open = true;
+
+    formDialog.appendChild(createProjectForm(oldProject, projectIndex));
+    onDialogOpen(formDialog);
+
+    return formDialog;
+}
+
+/**
+ * 
+ * @param {Project} oldProject 
+ * @param {Number} projectIndex 
+ * @returns 
+ */
+function createProjectForm(oldProject, projectIndex) {
     const form = document.createElement("form");
     form.setAttribute("action", "");
     form.setAttribute("form", "post");
     form.classList.add("project-form");
 
-    const content = createProjectFormContent();
-    const buttons = createProjectFormButtons();
+    const content = createProjectFormContent(oldProject, projectIndex);
+    const buttons = createProjectFormButtons(oldProject, projectIndex);
 
     form.append(content, buttons);
 
     return form;
 }
 
-function createProjectFormContent() {
+/**
+ * 
+ * @param {Project} oldProject
+ * @param {Number} projectIndex 
+ * @returns 
+ */
+function createProjectFormContent(oldProject, projectIndex) {
     const fieldset = document.createElement("fieldset");
     fieldset.classList.add("project-form-content");
 
@@ -299,13 +520,23 @@ function createProjectFormContent() {
     projectNameInput.setAttribute("placeholder", "project Name...");
     projectNameInput.required = true;
 
+    if (oldProject != null && projectIndex != null) {
+        projectNameInput.value = oldProject.projectName;
+    }
+
     fieldset.append(legend, projectNameLabel, projectNameInput);
 
     return fieldset;
 
 }
 
-function createProjectFormButtons() {
+/**
+ * 
+ * @param {Project} oldProject 
+ * @param {Number} projectIndex 
+ * @returns 
+ */
+function createProjectFormButtons(oldProject, projectIndex) {
     const container = document.createElement("div");
     container.classList.add("form-buttons");
 
@@ -319,7 +550,18 @@ function createProjectFormButtons() {
             form.reportValidity();
         } else {
             e.preventDefault();
-            dialogCreateNewProject(form["project-name"].value);
+            if (oldProject != null && projectIndex != null) {
+                dialogEditProject(
+                    new Project(
+                        form["project-name"].value,
+                        oldProject.getTodoList()
+                    ),
+                    projectIndex
+                );
+            } else {
+                dialogCreateNewProject(form["project-name"].value);
+            }
+
             onDialogClose(dialog);
         }
     });
@@ -351,6 +593,21 @@ function dialogCreateNewProject(projectName) {
 
 /**
  * 
+ * @param {Project} project 
+ * @param {Number} projectIndex 
+ */
+function dialogEditProject(project, projectIndex) {
+    const isAvailable = getCurrentProjectIndex() > -1;
+
+    if (isAvailable) {
+        const newProject = Object.assign({}, project);
+        replaceProject(projectIndex, newProject);
+        updateViewState();
+    }
+}
+
+/**
+ * 
  * @param {Todo} todo 
  */
 function dialogCreateNewTodo(todo) {
@@ -360,6 +617,24 @@ function dialogCreateNewTodo(todo) {
 
     if (isAvailable) {
         currentProject.pushTodo(todo);
+        replaceProject(getCurrentProjectIndex(), currentProject);
+        updateViewState();
+    }
+}
+
+/**
+ * 
+ * @param {Todo} todo
+ * @param {Number} todoIndex  
+ */
+function dialogEditTodo(todo, todoIndex) {
+    console.log(todo);
+    const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+    const isAvailable = getCurrentProjectIndex() > -1;
+
+    if (isAvailable) {
+        currentProject.replaceTodo(todoIndex, todo);
+
         replaceProject(getCurrentProjectIndex(), currentProject);
         updateViewState();
     }

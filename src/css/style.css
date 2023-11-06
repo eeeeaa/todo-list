@@ -108,6 +108,12 @@ body {
     cursor: pointer;
 }
 
+.project-container .project-item:hover,
+.todo-container .todo-item:hover {
+    transition: all 0.2s ease;
+    transform: scale(1.01);
+}
+
 .project-container .project-item {
     display: flex;
     white-space: nowrap;
@@ -134,23 +140,54 @@ body {
     .todo-title {
         margin-left: 1em;
         margin-right: auto;
+        white-space: nowrap;
+        overflow: hidden;
+        overflow-wrap: break-word;
+        text-overflow: ellipsis;
+        max-width: 250px;
     }
 }
 
-.project-container .project-item .project-delete-icon,
-.todo-container .todo-item .todo-delete-icon {
+.project-delete-icon,
+.todo-delete-icon,
+.todo-view-icon,
+.todo-edit-icon,
+.project-edit-icon {
     content: '';
     display: block;
     height: 1.5em;
     width: 1.5em;
-    background-image: url('../assets/icon/ic_cancel.svg');
     background-position: initial;
     background-size: initial;
     background-repeat: initial;
     fill: white;
 }
 
-.form-dialog {
+.project-delete-icon:hover,
+.todo-delete-icon:hover,
+.todo-view-icon:hover,
+.todo-edit-icon:hover,
+.project-edit-icon:hover {
+    transition: all 0.2s ease;
+    transform: scale(0.90);
+} 
+
+.project-delete-icon,
+.todo-delete-icon {
+    background-image: url('../assets/icon/ic_cancel.svg');
+}
+
+.todo-view-icon {
+    background-image: url('../assets/icon/ic_view.svg');
+}
+
+.project-edit-icon,
+.todo-edit-icon {
+    background-image: url('../assets/icon/ic_edit.svg');
+}
+
+.form-dialog,
+.form-view-dialog {
     border-radius: 1em;
     position: fixed;
     z-index: 10;
@@ -159,6 +196,12 @@ body {
     border-color: transparent;
     border-radius: 2em;
     background-color: #1e3a8a;
+}
+
+.form-view-dialog {
+    padding: 0;
+    border-radius: 1em;
+    background-color: #111827;
 }
 
 .toast-dialog {
@@ -232,6 +275,63 @@ body {
         display: grid;
         grid-template: auto/1fr 1fr;
         column-gap: 1em;
+    }
+}
+
+.todo-view-container {
+    display: grid;
+    grid-template: auto 5fr/auto;
+    gap: 1em;
+    align-items: center;
+
+    .todo-view-header {
+        display: flex;
+        gap: 1em;
+        align-items: center;
+        justify-content: space-between;
+        padding: 2em;
+        border-radius: 1em;
+
+        .todo-header-title {
+            font-size: x-large;
+            font-weight: 700;
+            margin-right: auto;
+        }
+
+        .todo-header-date {
+            margin-left: auto;
+        }
+
+        .todo-header-date,
+        .todo-header-priority {
+            font-size: small;
+            color: #9ca3af;
+            font-weight: 200;
+        }
+
+        .todo-header-title,
+        .todo-header-date,
+        .todo-header-priority {
+            white-space: nowrap;
+            overflow: hidden;
+            overflow-wrap: break-word;
+            text-overflow: ellipsis;
+            max-width: 250px;
+        }
+    }
+
+    .todo-view-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1em;
+        background-color: #0f172a;
+        padding: 1em;
+        border-radius: 1em;
+    }
+
+    .secondary-button {
+        margin: 1em;
     }
 }
 

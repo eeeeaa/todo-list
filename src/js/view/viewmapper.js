@@ -1,6 +1,6 @@
 import { Project } from '../dataSource/model/projectModel';
 import { Todo } from '../dataSource/model/todoModel';
-import { createTodoFormDialog, createProjectFormDialog } from './dialogHandler';
+import { createTodoFormDialog, createProjectFormDialog , todoViewIcon, createTodoViewDialog} from './dialogHandler';
 import { getCurrentProjectIndex, setCurrentProjectIndex } from '../repository/repository';
 import { makeToast } from './toastHandler';
 import { pushProject, getProjects, getProjectAt, replaceProject, removeProjectAt, getProjectCount } from '../repository/repository';
@@ -130,12 +130,22 @@ export function projectListNameToElementMapper(projectList) {
             e.stopPropagation();
         });
 
+        const projectEditIcon = document.createElement("div");
+        projectEditIcon.classList.add("project-edit-icon");
+        projectEditIcon.addEventListener("click", (e) => {
+            mainContent.prepend(createProjectFormDialog(projectList[i], i)); 
+            e.stopPropagation();
+        });
+
         const projectItemContent = document.createElement("div");
         projectItemContent.classList.add("project-title");
         projectItemContent.textContent = projectList[i].projectName;
 
-        projectItem.appendChild(projectDeleteIcon);
-        projectItem.appendChild(projectItemContent);
+        projectItem.append(
+            projectDeleteIcon,
+            projectEditIcon,
+            projectItemContent
+        );
 
         if (getCurrentProjectIndex() === i) {
             todoListToElementMapper(projectList[i]);
@@ -198,6 +208,28 @@ function todoListToElementMapper(project) {
             e.stopPropagation();
         });
 
+        const todoEditIcon = document.createElement("div");
+        todoEditIcon.classList.add("todo-edit-icon");
+        todoEditIcon.addEventListener("click", (e) => {
+            mainContent.prepend(createTodoFormDialog(todoList[i], i)); 
+            e.stopPropagation();
+        });
+
+
+        const todoViewIcon = document.createElement("div");
+        todoViewIcon.classList.add("todo-view-icon");
+        todoViewIcon.addEventListener("click", (e) => {
+            const currentProject = Object.assign({}, getProjectAt(getCurrentProjectIndex()));
+            const isAvailable = currentProject.getTodoList().length > 0;
+
+            if (isAvailable) {
+                const tempTodo = currentProject.getTodoList().slice()[i];
+                mainContent.prepend(createTodoViewDialog(tempTodo));
+                updateViewState();
+            }
+            e.stopPropagation();
+        });
+
         const todoTitle = document.createElement("div");
         todoTitle.classList.add("todo-title");
         todoTitle.textContent = todoList[i].title;
@@ -221,9 +253,13 @@ function todoListToElementMapper(project) {
             }
         });
 
-        todoItem.appendChild(todoDeleteIcon);
-        todoItem.appendChild(todoTitle);
-        todoItem.appendChild(todoCheckbox);
+        todoItem.append(
+            todoDeleteIcon,
+            todoEditIcon,
+            todoViewIcon,
+            todoTitle,
+            todoCheckbox
+        )
 
         todoContainer.appendChild(todoItem);
     }
